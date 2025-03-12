@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "ssh2": "^1.16.0",
+    "ssh2-sftp-client": "^11.0.0"
+  }
+}
