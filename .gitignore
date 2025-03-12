@@ -1,6 +1,5 @@
 /COLMAP
-/COLMAP-Examples/*/*
-!/COLMAP-Examples/*/run.sh
+COLMAP-Examples/
 */node_modules
 *.DS_Store
 /Public
