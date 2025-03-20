@@ -3,3 +3,4 @@ COLMAP-Examples/
 */node_modules
 *.DS_Store
 /Public
+*/*/node_modules

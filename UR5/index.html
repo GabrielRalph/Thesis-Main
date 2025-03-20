@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        ur-program {
+            display: flex;
+            flex-direction: column;
+            gap: 1em;
+        }
+
+        special-sequence, main-program {
+            display: flex;
+            flex-direction: column;
+            background: rgb(155, 192, 255);
+            border-radius: 0.5em;
+            padding: 0.5em;
+        }
+
+        main-program {
+            background: rgb(155, 255, 208);
+        }
+
+        ur-children {
+            padding-left: 1em;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5em;
+        }
+        ur-kinematics {
+            display: flex;
+            flex-direction: column;
+            padding: 0.5em;
+            border: 2px solid black;
+            border-radius: 0.5em;
+            gap: 0.5em;
+        }
+
+        ur-move {
+
+        }
+        ur-move::before {
+            content: attr(motiontype)
+        }
+
+        ur-halt {
+            display: inline-block;
+            background: rgb(240, 149, 149);
+            border-radius: 0.25em;
+            padding: 0.25em;
+        }
+        ur-halt::after {
+            content: "Halt"
+        }
+
+       
+        ur-move {
+            display: flex;
+        }
+
+        
+
+        [value] {
+            display: inline;
+            --prefix: "a "
+        }
+        [value]::after {
+            content:var(--prefix) attr(value);
+        }
+        
+        delta-theta[value] {
+            --prefix: "Delta Theta "
+        }
+
+        ur-a[value] {
+            --prefix: "A "
+        }
+        ur-d[value] {
+            --prefix: "D "
+        }
+        ur-alpha[value] {
+            --prefix: "Alpha "
+        }
+
+
+        ur-assignment {
+            display: flex;;
+        }
+        ur-variable {
+            display: inline;
+        }
+        ur-assignment ur-variable::after {
+            content: attr(name) " = ";
+        }
+        ur-expression {
+            display: flex;
+        }
+        expression-char {
+            display: inline;
+        }
+        expression-char::after {
+            content: " " attr(character);
+        }
+    </style>
+</head>
+<body>
+    
+</body>
+<script type = "module">
+    let text = await (await fetch("./XMLR-PC.xml")).text();
+
+    text = text.replace(/(<\w+)|(<\/\w+)/g, (a, b, c) => {
+        return a.replace(/\w+/, (a) => {
+            let lower = a.toLowerCase();
+            let newName = "";
+            let hyphCount = 0;
+            for (let i = 0; i < a.length; i++) {
+                let isCap = lower[i] !== a[i];
+                let isCapNext = i+1 < a.length ? lower[i+1] !== a[i+1] : false;
+                if (isCap && i > 0 && !isCapNext) {
+                    hyphCount++;
+                    newName+="-"
+                }
+                newName+=lower[i];
+            }
+            if (hyphCount == 0) {
+                newName = "ur-" + newName
+            }
+            return newName;
+        })
+    })
+
+    text = text.replace(/<([\w-]+)((\s+[\w-]+\s*=\s*["][^"]+["]\s*)*)\/>/g, (a,b,c,d) => {
+        console.log(a, b);
+        return a.slice(0, -2) + "></" +b + ">"
+    })
+    
+    document.body.innerHTML = text;
+</script>
+
+</html>

@@ -1,0 +1,57 @@
+def cross(a, b):
+  return  [a[1]*b[2]-b[1]*a[2], b[0]*a[2]-a[0]*b[2], a[0]*b[1]-b[0]*a[1]]
+end
+
+def lookat(p1, z1, r1, theta):
+      p2 = [p1[0] + r1 * cos(theta), p1[1] + r1 * sin(theta), p1[2] + z1]
+      
+      # Compute the frame such that the z axis looks at the object, the x axis is parallel to 
+      # the horizontal and the y axis is orthogonal to the x and y
+      # these vectors will form the rotation matrix R = [r_x, r_y, r_z] (for r_i column vec)
+      r_z = normalize([-r1 * cos(theta), -r1 * sin(theta), -z1])
+      r_x = normalize([r_z[1], -r_z[0], 0])
+      r_y = normalize(r_z - cross(r_x, r_z) + cross(r_x, cross(r_x, r_z)))
+
+      # Compute the rotation vector
+      trace_R = r_x[0] + r_y[1] + r_z[2] # find the trace of the rotation matrix
+      a_R = acos( (trace_R - 1) / 2)
+      rotV = a_R / (2 * sin(a_R)) * [r_y[2] - r_z[1], r_z[0]-r_x[2], r_x[1] - r_y[0]]
+
+      # return the final pose
+      result_pos = p[p2[0], p2[1], p2[2], rotV[0], rotV[1], rotV[2]]
+
+      return result_pos
+end
+
+
+def lookaround(poi, zlevel, r, freq, a=1.2, v=0.25):
+      i = 0
+      while i <= freq:
+            theta = d2r( 360 * i / freq )
+            np = lookat(poi, zlevel, r, theta)
+            blend_rad = 0
+            if i < freq:
+                  blend_rad = 0.9 * r * sin( d2r(360)/freq )
+            end
+            movej(np, a=a, v=v, r=blend_rad)
+            i = i + 1
+      end
+end
+
+def unwind():
+      cur_angles = get_actual_joint_positions()
+      cur_angles[5] = d2r(0)
+      movej(cur_angles, v = 3)
+end
+
+def scan3D(poi, max_z, max_r, freq_1 = 10, freq_2 = 50, a=1.2, v = 2.5):
+      i = 0
+      while i < freq_1:
+            alpha = d2r( 90 * (freq_1 - i - 1) / freq_1  )
+            z = max_z * sin(alpha)
+            r = max_r * cos(alpha)
+            lookaround(poi, z, r, freq_2, a=a, v=v)
+            unwind()
+            i = i + 1
+      end
+end
